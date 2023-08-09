@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless API with Docker
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  SamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 60
+      Architectures:
+        - x86_64
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      DockerTag: hei-admin
+      DockerContext: ./
+      Dockerfile: Dockerfile
+
+
+Outputs:
+  HttpApiUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"
